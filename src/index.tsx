@@ -1,14 +1,53 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
+import {createBrowserRouter, RouterProvider} from "react-router-dom";
+import {ErrorPage} from "./pages/error-page/ErrorPage";
+import {SignInPage} from "./pages/sign-in-page/SignInPage";
+import {AuthProvider} from "./components/auth-provider/AuthProvider";
+import {SignUpPage} from "./pages/sign-up-page/SignUpPage";
+import {ChatsPage} from "./pages/chats-page/ChatsPage";
+import {ProtectedRoute} from "./components/protected-route/ProtectedRoute";
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+    document.getElementById('root') as HTMLElement
 );
+
+const router = createBrowserRouter([
+    {
+        path: "/",
+        element:
+            <SignInPage/>
+        ,
+        errorElement: <ErrorPage/>,
+    },
+    {
+        path: "/sign-in",
+        element: <SignInPage/>
+        ,
+        errorElement: <ErrorPage/>,
+    },
+    {
+        path: "/sign-up",
+        element: <SignUpPage/>,
+    },
+    {
+        path: "/chats",
+        element: <ProtectedRoute><ChatsPage/></ProtectedRoute>,
+    },
+]);
+
+const AppProviders = () => {
+    return <AuthProvider >
+        <RouterProvider router={router}/>
+    </AuthProvider>
+}
+
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+    <React.StrictMode>
+        <AppProviders/>
+    </React.StrictMode>
 );
+
+
 
