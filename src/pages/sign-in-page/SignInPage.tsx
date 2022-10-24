@@ -1,47 +1,60 @@
-import {Box, Button, Center} from "@chakra-ui/react";
-import {FormInput} from "../../components/form-input/FormInput";
-import {useState} from "react";
+import { Box, Button, Center } from '@chakra-ui/react';
+import { FormInput } from '../../components/form-input/FormInput';
+import { useEffect, useState } from 'react';
+import { validateUsername } from '../../utils/validateUsername';
+import { HttpClient } from '../../api/HttpClient';
+import { useAuth } from '../../hooks/useAuth';
+import { useNavigate } from 'react-router';
 
 export const SignInPage = () => {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+  const { token, handleSignIn } = useAuth();
+  const navigate = useNavigate();
 
-    const [usernameError, setUsernameError] = useState(false);
-    const [usernameErrorMessage, setUsernameErrorMessage] = useState("Username or email is incorrect");
-
-    const validateUsername = (username: string) => {
-        if (username.length < 3) {
-            setUsernameError(true);
-            setUsernameErrorMessage("Username should contains minimum 3 characters");
-            return;
-        }
-        setUsernameError(false);
+  useEffect(() => {
+    if (token) {
+      navigate('/chats');
     }
+  }, [token]);
 
-    return (
-        <Center bg="tomato" h="100vh" color="white">
-            <Box sx={{display: "flex", flexDirection: "column"}}>
-                <h1>Sign in</h1>
-                <FormInput label={"Username or Email"} helperText={"Enter your username or email"}
-                           errorMessage={usernameErrorMessage}
-                           value={username}
-                           isError={usernameError}
-                           onChange={(event) => {
-                               setUsernameError(false);
-                               setUsername(event.target.value);
-                           }}
-                />
-                <FormInput label={"Password"} helperText={"Enter your password"}
-                           errorMessage={"Password is incorrect"}
-                           value={password}
-                           onChange={(event) => setPassword(event.target.value)}
-                />
-                <Button onClick={() => {
-                    validateUsername(username);
-                    console.log("username or email", username);
-                    console.log("password", password);
-                }}>Submit</Button>
-            </Box>
-        </Center>
-    );
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
+  const [usernameError, setUsernameError] = useState(false);
+  const [usernameErrorMessage, setUsernameErrorMessage] = useState('Username or email is incorrect');
+
+  return (
+    <Center bg='tomato' h='100vh' color='white'>
+      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+        <h1>Sign in</h1>
+        <FormInput label={'Username'} helperText={'Enter your username'}
+                   errorMessage={usernameErrorMessage}
+                   value={username}
+                   isError={usernameError}
+                   onChange={(event) => {
+                     setUsernameError(false);
+                     setUsername(event.target.value);
+                   }}
+                   onBlur={() => {
+                     validateUsername(username, setUsernameError, setUsernameErrorMessage);
+                   }}
+        />
+        <FormInput label={'Password'} helperText={'Enter your password'}
+                   errorMessage={'Password is incorrect'}
+                   value={password}
+                   onChange={(event) => setPassword(event.target.value)}
+        />
+        <Button onClick={async () => {
+          if (!usernameError) {
+            const {
+              token,
+              status,
+            } = await HttpClient.signIn({ username, password });
+            if (status === 'OK' && token) {
+              handleSignIn && handleSignIn(token);
+            }
+          }
+        }}>Submit</Button>
+      </Box>
+    </Center>
+  );
 };

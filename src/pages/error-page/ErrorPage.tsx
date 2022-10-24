@@ -1,5 +1,5 @@
-import { useRouteError } from "react-router-dom";
-import { Container } from "@chakra-ui/react";
+import { useRouteError } from 'react-router-dom';
+import { Container } from '@chakra-ui/react';
 
 export const ErrorPage = () => {
   const error = useRouteError() as {
