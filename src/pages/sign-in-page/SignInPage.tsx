@@ -45,12 +45,10 @@ export const SignInPage = () => {
         />
         <Button onClick={async () => {
           if (!usernameError) {
-            const {
-              token,
-              status,
-            } = await HttpClient.signIn({ username, password });
-            if (status === 'OK' && token) {
-              handleSignIn && handleSignIn(token);
+            const {token, userId, message} = await HttpClient.signIn({ username, password });
+            console.log(message);
+            if (userId && token) {
+              handleSignIn && handleSignIn(token, userId);
             }
           }
         }}>Submit</Button>

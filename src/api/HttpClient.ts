@@ -11,16 +11,18 @@ export class HttpClient {
     };
     try {
       let token;
-      let status;
+      let message;
+      let userId;
       await fetch(HttpClient.baseUrl + '/sign-in', parameters).then((response) => {
         return response.json();
       }).then(res => {
-        token = res;
-        status = 'OK';
+        token = res.token;
+        userId = res.userId;
+        message = res.message;
       });
-      return { token, status };
+      return { token, userId, message };
     } catch (err) {
-      return { token: null, status: 'NOT OK' };
+      return { token: null, userId: null, message: err };
     }
   }
 
@@ -34,16 +36,18 @@ export class HttpClient {
     };
     try {
       let token;
-      let status;
-      await fetch(HttpClient.baseUrl + '/sign-in', parameters).then((response) => {
+      let message;
+      let userId;
+      await fetch(HttpClient.baseUrl + '/sign-up', parameters).then((response) => {
         return response.json();
       }).then(res => {
-        token = res;
-        status = 'OK';
+        token = res.token;
+        userId = res.userId;
+        message = res.message;
       });
-      return { token, status };
+      return { token, userId, message };
     } catch (err) {
-      return { token: null, status: 'NOT OK' };
+      return { token: null, userId: null, message: err };
     }
   }
 }

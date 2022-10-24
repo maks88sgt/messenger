@@ -84,14 +84,15 @@ export const SignUpPage = () => {
           if (!confirmationPasswordError && !usernameError && !emailError && !passwordError) {
             const {
               token,
-              status,
+              userId,
+              message
             } = await HttpClient.signUp({
               username,
               password,
               email,
             });
-            if (status === 'OK' && token) {
-              handleSignIn && handleSignIn(token);
+            if (userId && token) {
+              handleSignIn && handleSignIn(token, userId);
             }
           }
         }}>Submit</Button>
