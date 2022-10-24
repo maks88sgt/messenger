@@ -1,3 +1,3 @@
-export const ChatsPage = ()=>{
-    return <>Chats Page</>
-}
+export const ChatsPage = () => {
+  return <>Chats Page</>;
+};
