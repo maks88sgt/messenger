@@ -32,7 +32,7 @@ export const FormInput = ({
     <FormControl isInvalid={isError}>
       <FormLabel>{label}</FormLabel>
       <Input type={type} value={value} onChange={onChange}
-             sx={{ height: '20px' }} onBlur={onBlur} />
+             sx={{ }} onBlur={onBlur} />
       {!isError ? (
         <FormHelperText>{helperText}</FormHelperText>
       ) : (

@@ -50,4 +50,36 @@ export class HttpClient {
       return { token: null, userId: null, message: err };
     }
   }
+
+  static async getUsers(): Promise<{ message: string; users?: UserDTO[] }> {
+    return await fetch(HttpClient.baseUrl + '/users').then((response) => {
+      return response.json();
+    }).then(res => res);
+  }
+
+  static async createChat(data: { chatName: string, chatUsers: (string | null | undefined)[] }) {
+    const parameters = {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+      },
+    };
+    return await fetch(HttpClient.baseUrl + '/create-chat', parameters).then((response) => {
+      return response.json();
+    }).then(res => res);
+  }
+
+  static async getChats(userId: string) {
+    return await fetch(HttpClient.baseUrl + `/chats?userId=${userId}`).then((response) => {
+      return response.json();
+    }).then(res => {
+      return res;
+    });
+  }
+}
+
+
+export type UserDTO = {
+  username: string; userId: string
 }

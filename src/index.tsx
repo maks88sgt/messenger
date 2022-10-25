@@ -8,6 +8,7 @@ import { AuthProvider } from './components/auth-provider/AuthProvider';
 import { SignUpPage } from './pages/sign-up-page/SignUpPage';
 import { ChatsPage } from './pages/chats-page/ChatsPage';
 import { ProtectedRoute } from './components/protected-route/ProtectedRoute';
+import { ChakraProvider } from '@chakra-ui/react';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,
@@ -40,9 +41,11 @@ const router = createBrowserRouter([
 
 const AppProviders = () => {
   return (
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
+    <ChakraProvider>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </ChakraProvider>
   );
 };
 

@@ -2,6 +2,8 @@ import { Box } from '@chakra-ui/react';
 import { ChatsList } from '../../components/chats-list/ChatsList';
 import { createContext, Dispatch, useEffect, useState } from 'react';
 import { ActiveChat } from '../../components/active-chat/ActiveChat';
+import { useAuth } from '../../hooks/useAuth';
+import { HttpClient } from '../../api/HttpClient';
 
 export type ChatContextApi = {
   listOfChats: ChatItem[]; selectedChat: null | ChatItem; setSelectedChat: null | Dispatch<ChatItem>
@@ -14,14 +16,17 @@ export const ChatsContext = createContext<ChatContextApi>({
 });
 
 export const ChatsPage = () => {
+const { userId } = useAuth();
 
   const [selectedChat, setSelectedChat] = useState<ChatItem | null>(null);
-  const [listOfChats, setListOfChats] = useState<ChatItem[]>(mockedChats);
+  const [listOfChats, setListOfChats] = useState<ChatItem[]>([]);
 
-  /*useEffect(() => {
-    setListOfChats(mockedChats);
-    console.log(listOfChats)
-  }, []);*/
+  useEffect(() => {
+    userId && HttpClient.getChats(userId).then((res)=>{
+      console.log("res", res);
+      setListOfChats(res.userChats);
+    });
+  }, []);
 
 
   return <Box sx={{
@@ -73,9 +78,9 @@ export const mockedChats = [
 
 
 export type ChatItem = {
-  id: number;
+  _id: string;
   chatName: string;
-  participants: number[];
+  participants: string[];
   messages: Message[];
 }
 
