@@ -132,3 +132,22 @@ app.get('/chats', async (request, response) => {
     response.status(500).send({ message: e.message });
   }
 });
+
+app.delete('/delete-chat', jsonParser ,async (request, response) => {
+  try {
+    const result = await chats.deleteOne({ chatName: { $eq: request.body.chatName }});
+    if (result.deletedCount) {
+      response.status(200).send({
+        message: 'Chat deleted',
+        deletedCount: result.deletedCount
+      });
+    } else {
+      response.status(404).send({
+        message: 'Chat not found',
+      });
+    }
+
+  } catch (e) {
+    response.status(500).send({ message: e.message });
+  }
+});

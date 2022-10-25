@@ -6,26 +6,28 @@ import { useAuth } from '../../hooks/useAuth';
 import { HttpClient } from '../../api/HttpClient';
 
 export type ChatContextApi = {
-  listOfChats: ChatItem[]; selectedChat: null | ChatItem; setSelectedChat: null | Dispatch<ChatItem>
+  listOfChats: ChatItem[]; selectedChat: null | ChatItem; setSelectedChat: null | Dispatch<ChatItem>; setListOfChats: null | Dispatch<ChatItem[]>
 }
 
 export const ChatsContext = createContext<ChatContextApi>({
   listOfChats: [],
   selectedChat: null,
   setSelectedChat: null,
+  setListOfChats: null
 });
 
 export const ChatsPage = () => {
-const { userId } = useAuth();
+  const { userId } = useAuth();
 
   const [selectedChat, setSelectedChat] = useState<ChatItem | null>(null);
   const [listOfChats, setListOfChats] = useState<ChatItem[]>([]);
 
   useEffect(() => {
+    let mounted = true;
     userId && HttpClient.getChats(userId).then((res)=>{
-      console.log("res", res);
-      setListOfChats(res.userChats);
+      mounted && setListOfChats(res.userChats);
     });
+    return ()=>{mounted = false}
   }, []);
 
 
@@ -37,7 +39,7 @@ const { userId } = useAuth();
     justifyContent: 'space-around',
   }}>
     <ChatsContext.Provider
-      value={{ selectedChat, setSelectedChat, listOfChats }}>
+      value={{ selectedChat, setSelectedChat, listOfChats, setListOfChats }}>
       <ChatsList />
       <ActiveChat />
     </ChatsContext.Provider>

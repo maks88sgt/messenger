@@ -10,9 +10,10 @@ import {
 } from '@chakra-ui/react';
 import { FormInput } from '../form-input/FormInput';
 import { UsersList } from '../users-list/UsersList';
-import { Dispatch, useEffect, useState } from 'react';
+import { Dispatch, useContext, useEffect, useState } from 'react';
 import { HttpClient, UserDTO } from '../../api/HttpClient';
 import { useAuth } from '../../hooks/useAuth';
+import { ChatsContext } from '../../pages/chats-page/ChatsPage';
 
 type NewChatProps = {
   modalIsOpen: boolean; setModalIsOpen: Dispatch<boolean>
@@ -20,6 +21,8 @@ type NewChatProps = {
 
 export const NewChat = ({ modalIsOpen, setModalIsOpen }: NewChatProps) => {
   const {userId} = useAuth();
+
+  const { setListOfChats } = useContext(ChatsContext);
 
   const [newChatName, setNewChatName] = useState('');
 
@@ -62,7 +65,11 @@ export const NewChat = ({ modalIsOpen, setModalIsOpen }: NewChatProps) => {
         <Button colorScheme='cyan' onClick={async ()=>{
           if (selectedUsers.length && newChatName) {
             const result = await HttpClient.createChat({chatName: newChatName, chatUsers: [userId, ...selectedUsers.map(user=>user.userId)]});
-            if (result.chatId) {
+            if (result.chatId && userId) {
+              const updatedChats = await HttpClient.getChats(userId);
+              setListOfChats && setListOfChats(updatedChats.userChats);
+              setNewChatName("");
+              setSelectedUsers([]);
               setModalIsOpen(false);
             } else {
               setChatNameError(true);

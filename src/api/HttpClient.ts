@@ -77,6 +77,22 @@ export class HttpClient {
       return res;
     });
   }
+
+  static async deleteChat(chatName: string) {
+    const parameters = {
+      method: 'DELETE',
+      body: JSON.stringify({ chatName }),
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+      },
+    };
+
+    return await fetch(HttpClient.baseUrl + `/delete-chat`, parameters).then((response) => {
+      return response.json();
+    }).then(res => {
+      return res;
+    });
+  }
 }
 
 
