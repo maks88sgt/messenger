@@ -41,7 +41,6 @@ export const ChatsPage = () => {
             const updatedListOfChats = [...listOfChats.filter((chat)=>chat.chatName !== data.chatName), newChat]
             setListOfChats(updatedListOfChats);
             if(data.chatName === selectedChat?.chatName) {
-                console.log("!!!!!");
                 setSelectedChat({...selectedChat, messages: data.messages} as ChatItem);
             }
         }
@@ -52,6 +51,7 @@ export const ChatsPage = () => {
         let mounted = true;
         userId &&
             HttpClient.getChats(userId).then((res) => {
+                console.log("userChats", res.userChats);
                 mounted && setListOfChats(res.userChats);
             });
         return () => {
@@ -115,7 +115,7 @@ export const ChatsPage = () => {
 export type ChatItem = {
     _id: string;
     chatName: string;
-    participants: string[];
+    chatUsers: string[];
     messages: Message[];
 };
 

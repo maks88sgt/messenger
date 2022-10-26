@@ -100,6 +100,7 @@ app.post('/sign-up', jsonParser, async (request, response) => {
     await users.insertOne(data);
     response.status(201).send(JSON.stringify({
       token: 'Sign-up token',
+      username: data.username,
       userId: data._id,
     }));
   } catch (e) {
@@ -116,6 +117,7 @@ app.post('/sign-in', jsonParser, async (request, response) => {
     if (existingUser) {
       response.status(200).send({
         message: 'Authorized',
+        username: existingUser.username,
         userId: existingUser._id,
         token: 'Sign-in token',
       });

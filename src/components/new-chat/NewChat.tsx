@@ -21,7 +21,7 @@ type NewChatProps = {
 };
 
 export const NewChat = ({ modalIsOpen, setModalIsOpen }: NewChatProps) => {
-    const { userId } = useAuth();
+    const { userId, username } = useAuth();
 
     const { setListOfChats } = useContext(ChatsContext);
 
@@ -86,9 +86,9 @@ export const NewChat = ({ modalIsOpen, setModalIsOpen }: NewChatProps) => {
                                 const result = await HttpClient.createChat({
                                     chatName: newChatName,
                                     chatUsers: [
-                                        userId,
+                                        username,
                                         ...selectedUsers.map(
-                                            (user) => user.userId,
+                                            (user) => user.username,
                                         ),
                                     ],
                                 });

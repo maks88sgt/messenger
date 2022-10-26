@@ -12,17 +12,19 @@ export class HttpClient {
     try {
       let token;
       let message;
+      let username;
       let userId;
       await fetch(`${HttpClient.baseUrl}/sign-in`, parameters)
         .then((response) => response.json())
         .then((res) => {
           token = res.token;
           userId = res.userId;
+          username = res.username;
           message = res.message;
         });
-      return { token, userId, message };
+      return { token, userId, username, message };
     } catch (err) {
-      return { token: null, userId: null, message: err };
+      return { token: null, username: null, userId: null, message: err };
     }
   }
 
@@ -41,17 +43,19 @@ export class HttpClient {
     try {
       let token;
       let message;
+      let username;
       let userId;
       await fetch(`${HttpClient.baseUrl}/sign-up`, parameters)
         .then((response) => response.json())
         .then((res) => {
           token = res.token;
           userId = res.userId;
+          username = res.username;
           message = res.message;
         });
-      return { token, userId, message };
+      return { token, userId, username, message };
     } catch (err) {
-      return { token: null, userId: null, message: err };
+      return { token: null, username: null, userId: null, message: err };
     }
   }
 

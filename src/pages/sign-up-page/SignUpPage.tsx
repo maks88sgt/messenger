@@ -122,14 +122,14 @@ export const SignUpPage = () => {
                             !emailError &&
                             !passwordError
                         ) {
-                            const { token, userId } =
+                            const { token, userId, username: createdUsername } =
                                 await HttpClient.signUp({
                                     username,
                                     password,
                                     email,
                                 });
                             if (userId && token) {
-                                handleSignIn && handleSignIn(token, userId);
+                                handleSignIn && handleSignIn(token, createdUsername, userId);
                             }
                         }
                     }}
