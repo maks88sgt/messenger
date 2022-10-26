@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
@@ -9,50 +9,48 @@ import { SignUpPage } from './pages/sign-up-page/SignUpPage';
 import { ChatsPage } from './pages/chats-page/ChatsPage';
 import { ProtectedRoute } from './components/protected-route/ProtectedRoute';
 import { ChakraProvider } from '@chakra-ui/react';
-import { io } from 'socket.io-client';
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement,
+    document.getElementById('root') as HTMLElement,
 );
 
 const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <SignInPage />,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/sign-in',
-    element: <SignInPage />,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/sign-up',
-    element: <SignUpPage />,
-  },
-  {
-    path: '/chats',
-    element: (
-      <ProtectedRoute>
-        <ChatsPage />
-      </ProtectedRoute>
-    ),
-  },
+    {
+        path: '/',
+        element: <SignInPage />,
+        errorElement: <ErrorPage />,
+    },
+    {
+        path: '/sign-in',
+        element: <SignInPage />,
+        errorElement: <ErrorPage />,
+    },
+    {
+        path: '/sign-up',
+        element: <SignUpPage />,
+    },
+    {
+        path: '/chats',
+        element: (
+            <ProtectedRoute>
+                <ChatsPage />
+            </ProtectedRoute>
+        ),
+    },
 ]);
 
 const AppProviders = () => {
-
-  return (
-    <ChakraProvider>
-      <AuthProvider>
-        <RouterProvider router={router} />
-      </AuthProvider>
-    </ChakraProvider>
-  );
+    return (
+        <ChakraProvider>
+            <AuthProvider>
+                <RouterProvider router={router} />
+            </AuthProvider>
+        </ChakraProvider>
+    );
 };
 
 root.render(
-  <React.StrictMode>
-    <AppProviders />
-  </React.StrictMode>,
+    <React.StrictMode>
+        <AppProviders />
+    </React.StrictMode>,
 );

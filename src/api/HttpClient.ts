@@ -13,20 +13,24 @@ export class HttpClient {
       let token;
       let message;
       let userId;
-      await fetch(HttpClient.baseUrl + '/sign-in', parameters).then((response) => {
-        return response.json();
-      }).then(res => {
-        token = res.token;
-        userId = res.userId;
-        message = res.message;
-      });
+      await fetch(`${HttpClient.baseUrl}/sign-in`, parameters)
+        .then((response) => response.json())
+        .then((res) => {
+          token = res.token;
+          userId = res.userId;
+          message = res.message;
+        });
       return { token, userId, message };
     } catch (err) {
       return { token: null, userId: null, message: err };
     }
   }
 
-  static async signUp(data: { username: string; email: string; password: string }) {
+  static async signUp(data: {
+    username: string;
+    email: string;
+    password: string;
+  }) {
     const parameters = {
       method: 'POST',
       body: JSON.stringify(data),
@@ -38,13 +42,13 @@ export class HttpClient {
       let token;
       let message;
       let userId;
-      await fetch(HttpClient.baseUrl + '/sign-up', parameters).then((response) => {
-        return response.json();
-      }).then(res => {
-        token = res.token;
-        userId = res.userId;
-        message = res.message;
-      });
+      await fetch(`${HttpClient.baseUrl}/sign-up`, parameters)
+        .then((response) => response.json())
+        .then((res) => {
+          token = res.token;
+          userId = res.userId;
+          message = res.message;
+        });
       return { token, userId, message };
     } catch (err) {
       return { token: null, userId: null, message: err };
@@ -52,12 +56,15 @@ export class HttpClient {
   }
 
   static async getUsers(): Promise<{ message: string; users?: UserDTO[] }> {
-    return await fetch(HttpClient.baseUrl + '/users').then((response) => {
-      return response.json();
-    }).then(res => res);
+    return await fetch(`${HttpClient.baseUrl}/users`)
+      .then((response) => response.json())
+      .then((res) => res);
   }
 
-  static async createChat(data: { chatName: string, chatUsers: (string | null | undefined)[] }) {
+  static async createChat(data: {
+    chatName: string;
+    chatUsers: (string | null | undefined)[];
+  }) {
     const parameters = {
       method: 'POST',
       body: JSON.stringify(data),
@@ -65,17 +72,15 @@ export class HttpClient {
         'Content-Type': 'application/json;charset=utf-8',
       },
     };
-    return await fetch(HttpClient.baseUrl + '/create-chat', parameters).then((response) => {
-      return response.json();
-    }).then(res => res);
+    return await fetch(`${HttpClient.baseUrl}/create-chat`, parameters)
+      .then((response) => response.json())
+      .then((res) => res);
   }
 
   static async getChats(userId: string) {
-    return await fetch(HttpClient.baseUrl + `/chats?userId=${userId}`).then((response) => {
-      return response.json();
-    }).then(res => {
-      return res;
-    });
+    return await fetch(`${HttpClient.baseUrl}/chats?userId=${userId}`)
+      .then((response) => response.json())
+      .then((res) => res);
   }
 
   static async deleteChat(chatName: string) {
@@ -87,15 +92,13 @@ export class HttpClient {
       },
     };
 
-    return await fetch(HttpClient.baseUrl + `/delete-chat`, parameters).then((response) => {
-      return response.json();
-    }).then(res => {
-      return res;
-    });
+    return await fetch(`${HttpClient.baseUrl}/delete-chat`, parameters)
+      .then((response) => response.json())
+      .then((res) => res);
   }
 }
 
-
 export type UserDTO = {
-  username: string; userId: string
-}
+  username: string;
+  userId: string;
+};
