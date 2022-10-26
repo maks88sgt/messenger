@@ -35,23 +35,31 @@ export const ChatsPage = () => {
     const socket = io('http://localhost:3001');
 
     socket.on('update_chat_messages', (data) => {
-        const newChat = listOfChats.find((chat)=>chat.chatName === data.chatName);
+        const newChat = listOfChats.find(
+            (chat) => chat.chatName === data.chatName,
+        );
         if (newChat) {
             newChat.messages = data.messages;
-            const updatedListOfChats = [...listOfChats.filter((chat)=>chat.chatName !== data.chatName), newChat]
+            const updatedListOfChats = [
+                ...listOfChats.filter(
+                    (chat) => chat.chatName !== data.chatName,
+                ),
+                newChat,
+            ];
             setListOfChats(updatedListOfChats);
-            if(data.chatName === selectedChat?.chatName) {
-                setSelectedChat({...selectedChat, messages: data.messages} as ChatItem);
+            if (data.chatName === selectedChat?.chatName) {
+                setSelectedChat({
+                    ...selectedChat,
+                    messages: data.messages,
+                } as ChatItem);
             }
         }
-
     });
 
     useEffect(() => {
         let mounted = true;
         userId &&
             HttpClient.getChats(userId).then((res) => {
-                console.log("userChats", res.userChats);
                 mounted && setListOfChats(res.userChats);
             });
         return () => {
@@ -62,24 +70,18 @@ export const ChatsPage = () => {
     const socketSendMessage = (
         newMessage: string,
         chatName: string,
-        userId: string,
+        username: string,
     ) => {
-        socket.emit(
-            'new_message',
-            {
-                message: newMessage,
-                userId,
-                chatName,
-            },
-            (response: any) => {
-                console.log(response.status); // ok
-            },
-        );
+        socket.emit('new_message', {
+            message: newMessage,
+            username,
+            chatName,
+        });
     };
 
-    const socketAddToRoom = (userId: string, chatName: string) => {
+    const socketAddToRoom = (username: string, chatName: string) => {
         socket.emit('add_to_room', {
-            userId,
+            username,
             chatName,
         });
     };
@@ -111,7 +113,6 @@ export const ChatsPage = () => {
     );
 };
 
-
 export type ChatItem = {
     _id: string;
     chatName: string;
@@ -122,6 +123,6 @@ export type ChatItem = {
 export type Message = {
     body: string;
     timestamp: number;
-    author: number;
-    isRead: number[];
+    author: string;
+    isRead: string[];
 };

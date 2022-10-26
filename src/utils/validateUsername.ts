@@ -2,18 +2,18 @@ import { Dispatch } from 'react';
 
 export const validateUsername = (
     username: string,
-    setErrror: Dispatch<boolean>,
+    setError: Dispatch<boolean>,
     setErrorMessage: Dispatch<string>,
 ) => {
     if (username.length < 3) {
-        setErrror(true);
+        setError(true);
         setErrorMessage('Username should contains minimum 3 characters');
         return;
     }
-    if (parseInt(username[0])) {
-        setErrror(true);
+    if (parseInt(username[0], 10)) {
+        setError(true);
         setErrorMessage('Username should start with characters');
         return;
     }
-    setErrror(false);
+    setError(false);
 };

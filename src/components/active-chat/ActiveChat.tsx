@@ -4,9 +4,11 @@ import { useContext, useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 
 export const ActiveChat = () => {
-    const { userId, username } = useAuth();
+    const { username } = useAuth();
     const { selectedChat, socketSendMessage } = useContext(ChatsContext);
     const [newMessage, setNewMessage] = useState('');
+
+    console.log(selectedChat?.messages);
 
     return (
         <Box sx={{ width: '100%' }}>
@@ -14,9 +16,11 @@ export const ActiveChat = () => {
                 <>
                     <Box>{selectedChat.chatName}</Box>
                     <Box>
-                        {selectedChat?.chatUsers?.filter((user)=>user != username).map((user) => (
-                            <Box key={user}>{user}</Box>
-                        ))}
+                        {selectedChat?.chatUsers
+                            ?.filter((user) => user != username)
+                            .map((user) => (
+                                <Box key={user}>{user}</Box>
+                            ))}
                     </Box>
                     {selectedChat.messages.map((message) => {
                         return (
@@ -37,13 +41,13 @@ export const ActiveChat = () => {
                             if (
                                 newMessage &&
                                 selectedChat &&
-                                userId &&
+                                username &&
                                 socketSendMessage
                             ) {
                                 socketSendMessage(
                                     newMessage,
                                     selectedChat.chatName,
-                                    userId,
+                                    username,
                                 );
                                 setNewMessage('');
                             }
@@ -60,6 +64,8 @@ export const ActiveChat = () => {
 };
 
 const MessageItem = ({ body, author, timestamp }: Partial<Message>) => {
+    const { username } = useAuth();
+
     return (
         <Box
             sx={{
@@ -67,7 +73,7 @@ const MessageItem = ({ body, author, timestamp }: Partial<Message>) => {
                 width: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: author === 1 ? 'flex-end' : 'flex-start',
+                alignItems: author === username ? 'flex-end' : 'flex-start',
             }}
         >
             <Box>{body}</Box>

@@ -42,18 +42,18 @@ export const ChatsList = () => {
 };
 
 const ListOfChats = ({ chats }: { chats: ChatItem[] }) => {
-    const { userId } = useAuth();
+    const { username } = useAuth();
     const { setSelectedChat, socketAddToRoom } = useContext(ChatsContext);
     return (
         <>
             {chats.map((item) => {
-                userId &&
+                username &&
                     socketAddToRoom &&
-                    socketAddToRoom(userId, item.chatName);
+                    socketAddToRoom(username, item.chatName);
                 const unreadMessagesCount = item.messages
-                    .filter((message) => message.author != 1)
+                    .filter((message) => message.author != username)
                     .filter((message) =>
-                        message.isRead?.some((it) => it == 1),
+                        message.isRead?.some((it) => it === username),
                     ).length;
                 return (
                     <Chat

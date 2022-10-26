@@ -20,7 +20,7 @@ app.get('/', (request, response) => {
 
 
 
-const { MongoClient, Collection } = require('mongodb');
+const { MongoClient } = require('mongodb');
 const client = new MongoClient(`mongodb://localhost:27017/`);
 
 let users;
@@ -53,7 +53,7 @@ socket.on("connect", (socket)=>{
   socket.on("new_message", async (data)=>{
     try {
       const timestamp = Date.now();
-      const res = await chats.updateOne ({ chatName: data?.chatName }, { $push: { messages: {body: data?.message, author: data?.userId, timestamp} } });
+      await chats.updateOne ({ chatName: data?.chatName }, { $push: { messages: {body: data?.message, author: data?.username, timestamp, isRead:[data.username]} } });
       const updatedChat = await chats.findOne ({ chatName: data?.chatName });
       socket.to(data.chatName).emit("update_chat_messages", {messages: updatedChat.messages, chatName: updatedChat.chatName})
     } catch (e) {

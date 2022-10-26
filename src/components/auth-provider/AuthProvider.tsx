@@ -11,7 +11,9 @@ export const AuthContext = createContext<{
     token: null | undefined | string;
     userId: null | undefined | string;
     username: null | undefined | string;
-    handleSignIn: null | ((token: string, username: string, userId: string) => void);
+    handleSignIn:
+        | null
+        | ((token: string, username: string, userId: string) => void);
     handleSignOut: null | (() => void);
 }>(initialAuthContext);
 
@@ -19,6 +21,14 @@ export const AuthProvider = ({ children }: { children: JSX.Element }) => {
     let savedToken;
     let savedUserId;
     let savedUsername;
+
+    const [token, setToken] = useState<null | undefined | string>(savedToken);
+    const [username, setUsername] = useState<null | undefined | string>(
+        savedUsername,
+    );
+    const [userId, setUserId] = useState<null | undefined | string>(
+        savedUserId,
+    );
 
     useEffect(() => {
         try {
@@ -33,15 +43,10 @@ export const AuthProvider = ({ children }: { children: JSX.Element }) => {
         }
     }, []);
 
-    const [token, setToken] = useState<null | undefined | string>(savedToken);
-    const [username, setUsername] = useState<null | undefined | string>(savedUsername);
-    const [userId, setUserId] = useState<null | undefined | string>(
-        savedUserId,
-    );
     const handleSignIn = (token: string, username: string, userId: string) => {
         setToken(token);
         setUserId(userId);
-        setUsername(username)
+        setUsername(username);
         try {
             window.localStorage.setItem('authToken', token);
             window.localStorage.setItem('userId', userId);

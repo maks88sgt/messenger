@@ -56,13 +56,21 @@ export const SignInPage = () => {
                 <Button
                     onClick={async () => {
                         if (!usernameError) {
-                            const { token, userId, username: fetchedUsername, message } =
-                                await HttpClient.signIn({
-                                    username,
-                                    password,
-                                });
+                            const {
+                                token,
+                                userId,
+                                username: fetchedUsername,
+                            } = await HttpClient.signIn({
+                                username,
+                                password,
+                            });
                             if (userId && token && fetchedUsername) {
-                                handleSignIn && handleSignIn(token,fetchedUsername, userId);
+                                handleSignIn &&
+                                    handleSignIn(
+                                        token,
+                                        fetchedUsername,
+                                        userId,
+                                    );
                             }
                         }
                     }}
