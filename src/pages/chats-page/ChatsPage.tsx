@@ -4,16 +4,22 @@ import { createContext, Dispatch, useEffect, useState } from 'react';
 import { ActiveChat } from '../../components/active-chat/ActiveChat';
 import { useAuth } from '../../hooks/useAuth';
 import { HttpClient } from '../../api/HttpClient';
+import { io } from 'socket.io-client';
 
 export type ChatContextApi = {
-  listOfChats: ChatItem[]; selectedChat: null | ChatItem; setSelectedChat: null | Dispatch<ChatItem>; setListOfChats: null | Dispatch<ChatItem[]>
+  listOfChats: ChatItem[];
+  selectedChat: null | ChatItem;
+  setSelectedChat: null | Dispatch<ChatItem>;
+  setListOfChats: null | Dispatch<ChatItem[]>;
+  socketSendMessage: any
 }
 
 export const ChatsContext = createContext<ChatContextApi>({
   listOfChats: [],
   selectedChat: null,
   setSelectedChat: null,
-  setListOfChats: null
+  setListOfChats: null,
+  socketSendMessage: null
 });
 
 export const ChatsPage = () => {
@@ -24,11 +30,26 @@ export const ChatsPage = () => {
 
   useEffect(() => {
     let mounted = true;
-    userId && HttpClient.getChats(userId).then((res)=>{
+    userId && HttpClient.getChats(userId).then((res) => {
+      console.log(res.userChats);
       mounted && setListOfChats(res.userChats);
     });
-    return ()=>{mounted = false}
+    return () => {
+      mounted = false;
+    };
   }, []);
+
+  const socket = io('http://localhost:3001');
+
+  const socketSendMessage = (newMessage: string, chatName: string, userId: string) => {
+    socket.emit('new message', {
+      message: newMessage,
+      userId,
+      chatName
+    }, (response: any) => {
+      console.log(response.status); // ok
+    });
+  };
 
 
   return <Box sx={{
@@ -39,7 +60,13 @@ export const ChatsPage = () => {
     justifyContent: 'space-around',
   }}>
     <ChatsContext.Provider
-      value={{ selectedChat, setSelectedChat, listOfChats, setListOfChats }}>
+      value={{
+        selectedChat,
+        setSelectedChat,
+        listOfChats,
+        setListOfChats,
+        socketSendMessage,
+      }}>
       <ChatsList />
       <ActiveChat />
     </ChatsContext.Provider>

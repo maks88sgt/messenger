@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
@@ -9,6 +9,7 @@ import { SignUpPage } from './pages/sign-up-page/SignUpPage';
 import { ChatsPage } from './pages/chats-page/ChatsPage';
 import { ProtectedRoute } from './components/protected-route/ProtectedRoute';
 import { ChakraProvider } from '@chakra-ui/react';
+import { io } from 'socket.io-client';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,
@@ -40,6 +41,7 @@ const router = createBrowserRouter([
 ]);
 
 const AppProviders = () => {
+
   return (
     <ChakraProvider>
       <AuthProvider>

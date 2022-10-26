@@ -1,10 +1,13 @@
 import { Box, Button, Center, Input } from '@chakra-ui/react';
 import { ChatsContext, Message } from '../../pages/chats-page/ChatsPage';
 import { useContext, useState } from 'react';
+import { useAuth } from '../../hooks/useAuth';
 
 export const ActiveChat = () => {
-  const { selectedChat } = useContext(ChatsContext);
+  const {userId} = useAuth();
+  const { selectedChat, socketSendMessage } = useContext(ChatsContext);
   const [newMessage, setNewMessage] = useState("");
+
 
   return <Box sx={{ width: '100%' }}>{selectedChat ?
     <>{selectedChat.messages.map((message) => {
@@ -16,8 +19,10 @@ export const ActiveChat = () => {
     })}</> : <Center w={'100%'}>Select a chat in the left side</Center>}
   <Input value={newMessage} onChange={(ev)=> setNewMessage(ev.target.value)}/>
     <Button onClick={()=>{
-      console.log(">>>>>>>>>>>", newMessage);
-      setNewMessage("")
+      if(newMessage && selectedChat && userId ) {
+        socketSendMessage(newMessage, selectedChat.chatName, userId);
+        setNewMessage("")
+      }
     }
     }>Send message</Button>
   </Box>;

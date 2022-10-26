@@ -34,7 +34,7 @@ export const ChatsList = () => {
 const ListOfChats = ({ chats }: { chats: ChatItem[] }) => {
   const { setSelectedChat } = useContext(ChatsContext);
   return <>{chats.map((item) => {
-    const unreadMessagesCount = item.messages.filter((message) => message.author != 1).filter((message) => message.isRead.some((it) => it == 1)).length;
+    const unreadMessagesCount = item.messages.filter((message) => message.author != 1).filter((message) => message.isRead?.some((it) => it == 1)).length;
     return <Chat key={item._id}
                  chatId={item._id}
                  chatName={item.chatName}

@@ -1,9 +1,11 @@
-const express = require('express');
+const express= require('express');
 
 const app = express();
 const path = require('path');
 const cors = require('cors');
-const bodyParser = require('body-parser');
+const {Server} = require("socket.io");
+const bodyParser = require("body-parser");
+
 const PORT = process.env.PORT || 3001;
 
 app.use(express.static(__dirname + '/build'));
@@ -16,13 +18,15 @@ app.get('/', (request, response) => {
   response.sendFile(path.resolve(__dirname, 'build', 'index.html'));
 });
 
+
+
 const { MongoClient, Collection } = require('mongodb');
 const client = new MongoClient(`mongodb://localhost:27017/`);
 
 let users;
 let chats;
 
-app.listen(PORT, async () => {
+const server = app.listen(PORT, async () => {
   try {
     await client.connect();
     users = client.db('newMongoDb').collection('users');
@@ -33,6 +37,27 @@ app.listen(PORT, async () => {
     console.error(e);
   }
 });
+
+const socket = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"]
+  }
+});
+
+socket.on("connect", (socket)=>{
+  socket.on("new message", async (data)=>{
+    try {
+      const res = await chats.updateOne ({ chatName: data?.chatName }, { $push: { messages: {body: data?.message, author: data?.userId, timestamp: Date.now()} } });
+      console.log("::::::::", res);
+    } catch (e) {
+      console.log(e);
+    }
+  })
+})
+
+
+
 
 app.get('/users', async (request, response) => {
   try {
