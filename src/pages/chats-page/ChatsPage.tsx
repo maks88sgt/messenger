@@ -11,7 +11,12 @@ export type ChatContextApi = {
     selectedChat: null | ChatItem;
     setSelectedChat: null | Dispatch<ChatItem>;
     setListOfChats: null | Dispatch<ChatItem[]>;
-    socketSendMessage: any;
+    socketSendMessage?: (
+        message: string,
+        userId: string,
+        chatId: string,
+    ) => void;
+    socketAddToRoom?: (userId: string, chatId: string) => void;
 };
 
 export const ChatsContext = createContext<ChatContextApi>({
@@ -19,7 +24,6 @@ export const ChatsContext = createContext<ChatContextApi>({
     selectedChat: null,
     setSelectedChat: null,
     setListOfChats: null,
-    socketSendMessage: null,
 });
 
 export const ChatsPage = () => {
@@ -28,11 +32,26 @@ export const ChatsPage = () => {
     const [selectedChat, setSelectedChat] = useState<ChatItem | null>(null);
     const [listOfChats, setListOfChats] = useState<ChatItem[]>([]);
 
+    const socket = io('http://localhost:3001');
+
+    socket.on('update_chat_messages', (data) => {
+        const newChat = listOfChats.find((chat)=>chat.chatName === data.chatName);
+        if (newChat) {
+            newChat.messages = data.messages;
+            const updatedListOfChats = [...listOfChats.filter((chat)=>chat.chatName !== data.chatName), newChat]
+            setListOfChats(updatedListOfChats);
+            if(data.chatName === selectedChat?.chatName) {
+                console.log("!!!!!");
+                setSelectedChat({...selectedChat, messages: data.messages} as ChatItem);
+            }
+        }
+
+    });
+
     useEffect(() => {
         let mounted = true;
         userId &&
             HttpClient.getChats(userId).then((res) => {
-                console.log(res.userChats);
                 mounted && setListOfChats(res.userChats);
             });
         return () => {
@@ -40,15 +59,13 @@ export const ChatsPage = () => {
         };
     }, []);
 
-    const socket = io('http://localhost:3001');
-
     const socketSendMessage = (
         newMessage: string,
         chatName: string,
         userId: string,
     ) => {
         socket.emit(
-            'new message',
+            'new_message',
             {
                 message: newMessage,
                 userId,
@@ -58,6 +75,13 @@ export const ChatsPage = () => {
                 console.log(response.status); // ok
             },
         );
+    };
+
+    const socketAddToRoom = (userId: string, chatName: string) => {
+        socket.emit('add_to_room', {
+            userId,
+            chatName,
+        });
     };
 
     return (
@@ -77,6 +101,7 @@ export const ChatsPage = () => {
                     listOfChats,
                     setListOfChats,
                     socketSendMessage,
+                    socketAddToRoom,
                 }}
             >
                 <ChatsList />
@@ -86,41 +111,6 @@ export const ChatsPage = () => {
     );
 };
 
-export const mockedChats = [
-    {
-        id: 1,
-        chatName: 'Headless project',
-        participants: [1, 2],
-        messages: [
-            {
-                body: 'Hello',
-                timestamp: Date.now(),
-                author: 1,
-                isRead: [2],
-            },
-            { body: 'Hi', timestamp: Date.now(), author: 2, isRead: [] },
-        ],
-    },
-    {
-        id: 2,
-        chatName: 'Outcomes',
-        participants: [1, 3],
-        messages: [
-            {
-                body: 'Are you here?',
-                timestamp: Date.now(),
-                author: 1,
-                isRead: [3],
-            },
-            {
-                body: 'Yes, I am',
-                timestamp: Date.now(),
-                author: 3,
-                isRead: [1],
-            },
-        ],
-    },
-];
 
 export type ChatItem = {
     _id: string;

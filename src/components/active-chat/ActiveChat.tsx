@@ -32,7 +32,7 @@ export const ActiveChat = () => {
             />
             <Button
                 onClick={() => {
-                    if (newMessage && selectedChat && userId) {
+                    if (newMessage && selectedChat && userId && socketSendMessage) {
                         socketSendMessage(
                             newMessage,
                             selectedChat.chatName,

@@ -46,10 +46,16 @@ const socket = new Server(server, {
 });
 
 socket.on("connect", (socket)=>{
-  socket.on("new message", async (data)=>{
+  socket.on("add_to_room", async (data)=>{
+    socket.join(data.chatName);
+  })
+
+  socket.on("new_message", async (data)=>{
     try {
-      const res = await chats.updateOne ({ chatName: data?.chatName }, { $push: { messages: {body: data?.message, author: data?.userId, timestamp: Date.now()} } });
-      console.log("::::::::", res);
+      const timestamp = Date.now();
+      const res = await chats.updateOne ({ chatName: data?.chatName }, { $push: { messages: {body: data?.message, author: data?.userId, timestamp} } });
+      const updatedChat = await chats.findOne ({ chatName: data?.chatName });
+      socket.to(data.chatName).emit("update_chat_messages", {messages: updatedChat.messages, chatName: updatedChat.chatName})
     } catch (e) {
       console.log(e);
     }
