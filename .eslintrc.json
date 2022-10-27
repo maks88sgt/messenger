@@ -11,7 +11,6 @@
     "plugin:react-hooks/recommended",
     "plugin:jsx-a11y/recommended",
     "plugin:import/recommended",
-    "airbnb",
     "prettier"
   ],
   "overrides": [],
@@ -27,6 +26,7 @@
     "import/order": "off",
     "import/no-unresolved": "off",
     "no-return-await": "off",
+    "no-unused-vars": "off",
     "react/jsx-curly-brace-presence": "off",
     "max-len": ["warn", { "code": 80 }]
   }

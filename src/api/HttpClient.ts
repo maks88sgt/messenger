@@ -106,4 +106,3 @@ export class HttpClient {
             .then((res) => res);
     }
 }
-

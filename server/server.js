@@ -1,136 +1,58 @@
 require('dotenv').config();
 const express = require('express');
-
-const app = express();
 const path = require('path');
 const cors = require('cors');
 const { Server } = require('socket.io');
 const bodyParser = require('body-parser');
+const jsonParser = bodyParser.json();
+const { MongoClient } = require('mongodb');
 
 const PORT = process.env.SERVER_PORT || 3001;
 
+const app = express();
+const client = new MongoClient(process.env.SERVER_DB_CONNECTION_STRING);
+
+//Send static sources from /build
 app.use(express.static(__dirname + '/build'));
+
+//Enable CORS requests
 app.use(cors());
 
-const jsonParser = bodyParser.json();
-
+//Send index page on first request
 app.get('/', (request, response) => {
   response.sendFile(path.resolve(__dirname, 'build', 'index.html'));
 });
 
-const { MongoClient } = require('mongodb');
-const client = new MongoClient(process.env.SERVER_DB_CONNECTION_STRING);
+// Users collection
+let USERS;
 
-let users;
-let chats;
+//Chats collection
+let CHATS;
 
+//Server initialization, DB connection
 const server = app.listen(PORT, async () => {
   try {
     await client.connect();
-    users = client.db('newMongoDb').collection('users');
+    USERS = client.db('newMongoDb').collection('users');
     console.log(
       'Database connected, and contains ',
-      await users.count(),
+      await USERS.count(),
       ' user records',
     );
     console.log(`Example app listening on port ${PORT}!`);
-    chats = client.db('newMongoDb').collection('chats');
+    CHATS = client.db('newMongoDb').collection('chats');
   } catch (e) {
     console.error(e);
   }
 });
 
-const socket = new Server(server, {
-  cors: {
-    origin: 'http://localhost:3000',
-    methods: ['GET', 'POST'],
-  },
-});
 
-socket.on('connect', (socket) => {
-  socket.on('add_to_room', async (data) => {
-    socket.join(data.chatName);
-  });
+// REST part
 
-  socket.on('new_message', async (data) => {
-    try {
-      const timestamp = Date.now();
-      await chats.updateOne(
-        { chatName: data?.chatName },
-        {
-          $push: {
-            messages: {
-              body: data?.message,
-              author: data?.username,
-              timestamp,
-              isRead: [data.username],
-            },
-          },
-        },
-      );
-      const updatedChat = await chats.findOne({
-        chatName: data?.chatName,
-      });
-      socket.in(data.chatName).emit('update_chat_messages', {
-        messages: updatedChat.messages,
-        chatName: updatedChat.chatName,
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  });
-
-  socket.on('read_new_messages', async (data) => {
-    try {
-      const chat = await chats.findOne({
-        chatName: data?.chatName,
-      });
-
-      const updatedMessages = chat.messages.map((message) => {
-        if (message.isRead.some(it => it === data.username)) {
-          return message;
-        } else {
-          message.isRead.push(data.username);
-          return message;
-        }
-      });
-
-      await chats.updateOne(
-          { chatName: data?.chatName },
-          {
-              $unset: {
-                  messages: 1,
-              },
-          },
-      );
-      await chats.updateOne(
-        { chatName: data?.chatName },
-        {
-          $set: {
-            messages: updatedMessages,
-          },
-        },
-      );
-      const updatedChat = await chats.findOne({
-        chatName: data?.chatName,
-      });
-
-      updatedChat.messages.forEach((message) =>
-        console.log('isRead', message.isRead),
-      );
-      socket.emit('update_chat_messages', {
-        messages: updatedChat.messages,
-        chatName: updatedChat.chatName,
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  });
-});
-
+//Get users endpoint
 app.get('/users', async (request, response) => {
   try {
-    const cursor = await users.find({});
+    const cursor = await USERS.find({});
     const usersList = [];
     await cursor.forEach((item) => {
       usersList.push({ userId: item._id, username: item.username });
@@ -149,7 +71,7 @@ app.post('/sign-up', jsonParser, async (request, response) => {
   const data = { username, email, password, _id: null };
 
   try {
-    let existingUser = await users.findOne({
+    let existingUser = await USERS.findOne({
       $or: [{ username: { $eq: username } }, { email: { $eq: email } }],
     });
     if (existingUser) {
@@ -162,7 +84,7 @@ app.post('/sign-up', jsonParser, async (request, response) => {
   }
 
   try {
-    await users.insertOne(data);
+    await USERS.insertOne(data);
     response.status(201).send(
       JSON.stringify({
         token: 'Sign-up token',
@@ -180,7 +102,7 @@ app.post('/sign-in', jsonParser, async (request, response) => {
   const { username, password } = request.body;
 
   try {
-    let existingUser = await users.findOne({
+    let existingUser = await USERS.findOne({
       $and: [
         { username: { $eq: username } },
         { password: { $eq: password } },
@@ -203,14 +125,15 @@ app.post('/sign-in', jsonParser, async (request, response) => {
   }
 });
 
+//Create chat endpoint
 app.post('/create-chat', jsonParser, async (request, response) => {
   const { chatName, chatUsers } = request.body;
   const newChat = { chatName, chatUsers, messages: [] };
 
   try {
-    let existingChat = await chats.findOne({ chatName: { $eq: chatName } });
+    let existingChat = await CHATS.findOne({ chatName: { $eq: chatName } });
     if (!existingChat) {
-      await chats.insertOne(newChat);
+      await CHATS.insertOne(newChat);
       response.status(200).send({
         message: 'New chat created',
         chatId: newChat._id,
@@ -228,9 +151,10 @@ app.post('/create-chat', jsonParser, async (request, response) => {
   }
 });
 
+//Get chats endpoint
 app.get('/chats', async (request, response) => {
   try {
-    const cursor = await chats.find({
+    const cursor = await CHATS.find({
       userId: { $eq: request.params?.userId },
     });
     const userChats = [];
@@ -246,9 +170,10 @@ app.get('/chats', async (request, response) => {
   }
 });
 
+//Delete chat endpoint
 app.delete('/delete-chat', jsonParser, async (request, response) => {
   try {
-    const result = await chats.deleteOne({
+    const result = await CHATS.deleteOne({
       chatName: { $eq: request.body.chatName },
     });
     if (result.deletedCount) {
@@ -264,4 +189,99 @@ app.delete('/delete-chat', jsonParser, async (request, response) => {
   } catch (e) {
     response.status(500).send({ message: e.message });
   }
+});
+
+
+//WS part
+
+//WS server initialization
+const socket = new Server(server, {
+  cors: {
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+  },
+});
+
+//Main socket handler
+socket.on('connect', (socket) => {
+
+  //Add new connected user to the room
+  socket.on('add_to_room', async (data) => {
+    socket.join(data.chatName);
+  });
+
+
+  //Handle new message
+  socket.on('new_message', async (data) => {
+    try {
+      const timestamp = Date.now();
+      await CHATS.updateOne(
+        { chatName: data?.chatName },
+        {
+          $push: {
+            messages: {
+              body: data?.message,
+              author: data?.username,
+              timestamp,
+              isRead: [data.username],
+            },
+          },
+        },
+      );
+      const updatedChat = await CHATS.findOne({
+        chatName: data?.chatName,
+      });
+      socket.in(data.chatName).emit('update_chat_messages', {
+        messages: updatedChat.messages,
+        chatName: updatedChat.chatName,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  });
+
+  //Handle recently viewed messages
+  socket.on('read_new_messages', async (data) => {
+    try {
+      const chat = await CHATS.findOne({
+        chatName: data?.chatName,
+      });
+
+      const updatedMessages = chat.messages.map((message) => {
+        if (message.isRead.some(it => it === data.username)) {
+          return message;
+        } else {
+          message.isRead.push(data.username);
+          return message;
+        }
+      });
+
+      await CHATS.updateOne(
+        { chatName: data?.chatName },
+        {
+          $unset: {
+            messages: 1,
+          },
+        },
+      );
+      await CHATS.updateOne(
+        { chatName: data?.chatName },
+        {
+          $set: {
+            messages: updatedMessages,
+          },
+        },
+      );
+      const updatedChat = await CHATS.findOne({
+        chatName: data?.chatName,
+      });
+
+      socket.emit('update_chat_messages', {
+        messages: updatedChat.messages,
+        chatName: updatedChat.chatName,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  });
 });

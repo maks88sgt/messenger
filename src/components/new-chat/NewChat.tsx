@@ -13,7 +13,7 @@ import { UsersList } from '../users-list/UsersList';
 import { Dispatch, useContext, useState } from 'react';
 import { HttpClient, UserDTO } from '../../api/HttpClient';
 import { useAuth } from '../../hooks/useAuth';
-import { ChatsContext } from '../../pages/chats-page/ChatsPage';
+import { ChatsContext } from '../chats-context/ChatsContext';
 
 type NewChatProps = {
     modalIsOpen: boolean;
