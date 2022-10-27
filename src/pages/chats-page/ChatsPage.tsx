@@ -6,6 +6,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { HttpClient } from '../../api/HttpClient';
 import { io } from 'socket.io-client';
 
+//TODO: check naming
 export type ChatContextApi = {
     listOfChats: ChatItem[];
     selectedChat: null | ChatItem;
@@ -17,6 +18,7 @@ export type ChatContextApi = {
         chatId: string,
     ) => void;
     socketAddToRoom?: (userId: string, chatId: string) => void;
+    socketReadNewMessages?:(userId: string, chatId: string) => void;
 };
 
 export const ChatsContext = createContext<ChatContextApi>({
@@ -86,6 +88,13 @@ export const ChatsPage = () => {
         });
     };
 
+    const socketReadNewMessages = (chatName: string, username: string) =>{
+            socket.emit('read_new_messages', {
+                username,
+                chatName,
+            });
+    }
+
     return (
         <Box
             sx={{
@@ -104,6 +113,7 @@ export const ChatsPage = () => {
                     setListOfChats,
                     socketSendMessage,
                     socketAddToRoom,
+                    socketReadNewMessages
                 }}
             >
                 <ChatsList />

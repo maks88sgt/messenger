@@ -9,7 +9,7 @@ export const ChatsList = () => {
     const { listOfChats } = useContext(ChatsContext);
 
     const [search, setSearch] = useState('');
-    const [filteredChats, setFilteredChats] = useState(listOfChats);
+    const [filteredChats, setFilteredChats] = useState([...listOfChats]);
 
     useEffect(() => {
         if (search) {
@@ -43,25 +43,32 @@ export const ChatsList = () => {
 
 const ListOfChats = ({ chats }: { chats: ChatItem[] }) => {
     const { username } = useAuth();
-    const { setSelectedChat, socketAddToRoom } = useContext(ChatsContext);
+    const { setSelectedChat, socketAddToRoom, socketReadNewMessages } =
+        useContext(ChatsContext);
+
     return (
         <>
             {chats.map((item) => {
                 username &&
                     socketAddToRoom &&
                     socketAddToRoom(username, item.chatName);
-                const unreadMessagesCount = item.messages
-                    .filter((message) => message.author != username)
-                    .filter((message) =>
-                        message.isRead?.some((it) => it === username),
-                    ).length;
+                const unreadMessagesCount = item.messages.filter((message) => {
+                    return !message?.isRead?.includes(username as string);
+                }).length;
                 return (
                     <Chat
                         key={item._id}
                         chatId={item._id}
                         chatName={item.chatName}
                         unreadMessagesCount={unreadMessagesCount}
-                        onClick={() => setSelectedChat && setSelectedChat(item)}
+                        onClick={() => {
+                            socketReadNewMessages &&
+                                socketReadNewMessages(
+                                    item.chatName,
+                                    username as string,
+                                );
+                            setSelectedChat && setSelectedChat(item);
+                        }}
                     />
                 );
             })}
