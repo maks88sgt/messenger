@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Box, Button, Center } from '@chakra-ui/react';
+import { Box, Button, Center, Heading, Link, Text } from '@chakra-ui/react';
 import { FormInput } from '../../components/form-input/FormInput';
 import { validateUsername } from '../../utils/validateUsername';
 import { validateEmail } from '../../utils/validateEmail';
@@ -7,6 +7,7 @@ import { validatePassword } from '../../utils/validatePassword';
 import { HttpClient } from '../../api/HttpClient';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router';
+import { Link as RouterLink } from 'react-router-dom';
 
 export const SignUpPage = () => {
     const { token, handleSignIn } = useAuth();
@@ -41,9 +42,16 @@ export const SignUpPage = () => {
         useState(false);
 
     return (
-        <Center bg="tomato" h="100vh" color="white">
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                <h1>Sign up</h1>
+        <Center h="100vh" sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Heading as="h1">Sign up</Heading>
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    width: '30%',
+                    gap: '20px',
+                }}
+            >
                 <FormInput
                     label={'Username'}
                     helperText={'Enter your username'}
@@ -115,6 +123,7 @@ export const SignUpPage = () => {
                     }
                 />
                 <Button
+                    colorScheme={'teal'}
                     onClick={async () => {
                         if (
                             !confirmationPasswordError &&
@@ -144,6 +153,12 @@ export const SignUpPage = () => {
                 >
                     Submit
                 </Button>
+                <Text align={'center'}>
+                    Already have an account.{' '}
+                    <Link as={RouterLink} to={'/sign-in'}>
+                        Sign in please
+                    </Link>
+                </Text>
             </Box>
         </Center>
     );

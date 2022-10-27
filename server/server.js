@@ -134,6 +134,7 @@ app.post('/create-chat', jsonParser, async (request, response) => {
     let existingChat = await CHATS.findOne({ chatName: { $eq: chatName } });
     if (!existingChat) {
       await CHATS.insertOne(newChat);
+      socket.emit("new_chat_created", {chatUsers});
       response.status(200).send({
         message: 'New chat created',
         chatId: newChat._id,
@@ -231,6 +232,7 @@ socket.on('connect', (socket) => {
       const updatedChat = await CHATS.findOne({
         chatName: data?.chatName,
       });
+
       socket.in(data.chatName).emit('update_chat_messages', {
         messages: updatedChat.messages,
         chatName: updatedChat.chatName,
@@ -247,11 +249,11 @@ socket.on('connect', (socket) => {
         chatName: data?.chatName,
       });
 
-      const updatedMessages = chat.messages.map((message) => {
-        if (message.isRead.some(it => it === data.username)) {
+      const updatedMessages = chat?.messages?.map((message) => {
+        if (message?.isRead?.some(it => it === data.username)) {
           return message;
         } else {
-          message.isRead.push(data.username);
+          message?.isRead?.push(data.username);
           return message;
         }
       });
@@ -277,8 +279,8 @@ socket.on('connect', (socket) => {
       });
 
       socket.emit('update_chat_messages', {
-        messages: updatedChat.messages,
-        chatName: updatedChat.chatName,
+        messages: updatedChat?.messages,
+        chatName: updatedChat?.chatName,
       });
     } catch (e) {
       console.log(e);

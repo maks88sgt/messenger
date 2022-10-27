@@ -10,7 +10,7 @@ export const ChatContextProvider = ({
 }: {
     children: JSX.Element;
 }) => {
-    const { userId } = useAuth();
+    const { userId, username } = useAuth();
 
     const [selectedChat, setSelectedChat] = useState<ChatItem | null>(null);
     const [listOfChats, setListOfChats] = useState<ChatItem[]>([]);
@@ -18,18 +18,12 @@ export const ChatContextProvider = ({
     const socket = io('http://localhost:3001');
 
     socket.on('update_chat_messages', (data) => {
-        const newChat = listOfChats.find(
+        const newChatIndex = listOfChats.findIndex(
             (chat) => chat.chatName === data.chatName,
         );
-        if (newChat) {
-            newChat.messages = data.messages;
-            const updatedListOfChats = [
-                ...listOfChats.filter(
-                    (chat) => chat.chatName !== data.chatName,
-                ),
-                newChat,
-            ];
-            setListOfChats(updatedListOfChats);
+        if (newChatIndex !== -1) {
+            listOfChats[newChatIndex].messages = data.messages
+            setListOfChats(listOfChats);
             if (data.chatName === selectedChat?.chatName) {
                 setSelectedChat({
                     ...selectedChat,
@@ -38,6 +32,15 @@ export const ChatContextProvider = ({
             }
         }
     });
+
+    socket.on("new_chat_created", (data)=>{
+        if (data.chatUsers.includes(username)){
+            userId &&
+            HttpClient.getChats(userId).then((res) => {
+                setListOfChats(res.userChats);
+            });
+        }
+    })
 
     useEffect(() => {
         let mounted = true;

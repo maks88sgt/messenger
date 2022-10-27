@@ -24,7 +24,7 @@ export const ActiveChat = () => {
                     {selectedChat.messages.map((message) => {
                         return (
                             <MessageItem
-                                key={message.body}
+                                key={message.author+message.timestamp}
                                 body={message.body}
                                 author={message.author}
                                 timestamp={message.timestamp}

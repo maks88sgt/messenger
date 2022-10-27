@@ -25,13 +25,14 @@ export const ChatsListContainer = () => {
     const [modalIsOpen, setModalIsOpen] = useState(false);
 
     return (
-        <Box sx={{ width: '33%', border: '1px solid black' }}>
+        <Box sx={{ width: '40%', backgroundColor: 'cyan.50', p: "20px", position: "relative" }}>
             <Input
                 value={search}
                 onChange={(ev) => setSearch(ev.target.value)}
+                placeholder={"Search chat by name"}
             />
             <ChatsList chats={filteredChats} />
-            <Button onClick={() => setModalIsOpen(true)}>Add new chat</Button>
+            <Button colorScheme={"teal"} sx={{position: "absolute", bottom: "20px", right: "20px"}} onClick={() => setModalIsOpen(true)}>Add new chat</Button>
             <NewChat
                 modalIsOpen={modalIsOpen}
                 setModalIsOpen={setModalIsOpen}
