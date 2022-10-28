@@ -1,4 +1,5 @@
 import {
+    Box,
     Button,
     Modal,
     ModalBody,
@@ -48,10 +49,10 @@ export const NewChat = ({ modalIsOpen, setModalIsOpen }: NewChatProps) => {
     return (
         <Modal isOpen={modalIsOpen} onClose={() => null}>
             <ModalOverlay />
-            <ModalContent sx={{ width: '40vw', height: '50vh' }}>
+            <ModalContent sx={{ width: '40vw', maxHeight: '60vh' }}>
                 <ModalHeader>Add new chat</ModalHeader>
                 <ModalCloseButton onClick={() => setModalIsOpen(false)} />
-                <ModalBody>
+                <ModalBody sx={{ maxHeight: '40vh' }}>
                     <FormInput
                         value={newChatName}
                         helperText={'Enter new chat name'}
@@ -63,16 +64,16 @@ export const NewChat = ({ modalIsOpen, setModalIsOpen }: NewChatProps) => {
                             setNewChatName(ev.target.value);
                         }}
                     />
+                    <Box sx={{ pt: '20px' }}>Select users for your chat</Box>
                     <UsersList
                         addUser={addUser}
                         deleteUser={deleteUser}
                         selectedUsers={selectedUsers}
                     />
                 </ModalBody>
-
                 <ModalFooter>
                     <Button
-                        colorScheme="cyan"
+                        colorScheme="teal"
                         variant={'outline'}
                         mr={3}
                         onClick={() => setModalIsOpen(false)}
@@ -80,7 +81,7 @@ export const NewChat = ({ modalIsOpen, setModalIsOpen }: NewChatProps) => {
                         Close
                     </Button>
                     <Button
-                        colorScheme="cyan"
+                        colorScheme="teal"
                         onClick={async () => {
                             if (selectedUsers.length && newChatName) {
                                 const result = await HttpClient.createChat({

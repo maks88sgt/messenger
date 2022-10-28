@@ -13,7 +13,7 @@ export const ChatsPage = () => {
                 height: '100vh',
                 justifyContent: 'space-around',
                 m: '0 auto',
-                border: "solid 1px teal"
+                border: 'solid 1px teal',
             }}
         >
             <ChatContextProvider>

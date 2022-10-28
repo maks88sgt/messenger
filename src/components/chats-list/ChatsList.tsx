@@ -21,16 +21,16 @@ export const ChatsList = ({ chats }: { chats: ChatItem[] }) => {
                 maxHeight: '80vh',
                 scrollbarColor: 'teal',
                 '&::-webkit-scrollbar': { width: '3px' },
-                '&::-webkit-scrollbar-thumb': { background: "teal.900" },
-                '&::-webkit-scrollbar-track': { background: "teal.400" },
-              pl: "10px"
+                '&::-webkit-scrollbar-thumb': { background: 'teal.900' },
+                '&::-webkit-scrollbar-track': { background: 'teal.400' },
+                pl: '10px',
             }}
         >
             {chats.map((item) => {
                 username &&
                     socketAddToRoom &&
                     socketAddToRoom(username, item.chatName);
-                const unreadMessagesCount = item.messages.filter((message) => {
+                const unreadMessagesCount = item.messages?.filter((message) => {
                     return !message?.isRead?.includes(username as string);
                 }).length;
                 return (

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import { HttpClient } from '../../api/HttpClient';
 import { ChatsContext } from './ChatsContext';
-import { ChatItem } from '../../types';
+import { ChatItem, Message } from '../../types';
 
 export const ChatContextProvider = ({
     children,
@@ -22,25 +22,32 @@ export const ChatContextProvider = ({
             (chat) => chat.chatName === data.chatName,
         );
         if (newChatIndex !== -1) {
-            listOfChats[newChatIndex].messages = data.messages
-            setListOfChats(listOfChats);
+            let messages = data.messages;
             if (data.chatName === selectedChat?.chatName) {
+                messages = data.messages?.map((message: Message) => {
+                    if (!message.isRead?.includes(username as string)) {
+                        message.isRead?.push(username as string);
+                    }
+                    return message;
+                });
                 setSelectedChat({
                     ...selectedChat,
-                    messages: data.messages,
+                    messages,
                 } as ChatItem);
             }
+            listOfChats[newChatIndex].messages = messages;
+            setListOfChats([...listOfChats]);
         }
     });
 
-    socket.on("new_chat_created", (data)=>{
-        if (data.chatUsers.includes(username)){
+    socket.on('new_chat_created', (data) => {
+        if (data.chatUsers.includes(username)) {
             userId &&
-            HttpClient.getChats(userId).then((res) => {
-                setListOfChats(res.userChats);
-            });
+                HttpClient.getChats(userId).then((res) => {
+                    setListOfChats(res.userChats);
+                });
         }
-    })
+    });
 
     useEffect(() => {
         let mounted = true;

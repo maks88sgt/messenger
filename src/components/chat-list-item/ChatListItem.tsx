@@ -43,7 +43,7 @@ export const ChatListItem = ({
                     px: '10px',
                     backgroundColor:
                         selectedChat?.chatName === chatName ? 'teal.200' : '',
-                  cursor: "pointer"
+                    cursor: 'pointer',
                 }}
                 onClick={onClick}
             >

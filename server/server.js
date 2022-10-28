@@ -78,6 +78,7 @@ app.post('/sign-up', jsonParser, async (request, response) => {
       response
         .status(409)
         .send(JSON.stringify({ message: 'User already exists' }));
+      return;
     }
   } catch (e) {
     response.status(500).send({ message: e.message });
@@ -233,7 +234,7 @@ socket.on('connect', (socket) => {
         chatName: data?.chatName,
       });
 
-      socket.in(data.chatName).emit('update_chat_messages', {
+      socket.in(updatedChat.chatName).emit('update_chat_messages', {
         messages: updatedChat.messages,
         chatName: updatedChat.chatName,
       });
