@@ -20,7 +20,7 @@ app.use(cors());
 
 //Send index page on first request
 app.get('/', (request, response) => {
-  response.sendFile(path.resolve(__dirname, 'build', 'index.html'));
+  response.sendFile(path.resolve(__dirname, '/build', 'index.html'));
 });
 
 // Users collection
@@ -199,7 +199,7 @@ app.delete('/delete-chat', jsonParser, async (request, response) => {
 
 //WS part
 
-//WS server initialization
+//WS server-utils initialization
 const socket = new Server(server, {
   cors: {
     origin: 'http://localhost:3000',
