@@ -212,14 +212,11 @@ socket.on('connect', (socket) => {
 
   //Add new connected user to the room
   socket.on('add_to_room', async (data) => {
-    console.log("!!!!!!", "connected")
     socket.join(data.chatName);
   });
 
-  console.log("!!!!!!", "connected")
   //Handle new message
   socket.on('new_message', async (data) => {
-    console.log(">>>>>>>>>>>>>", data)
     try {
       const timestamp = Date.now();
       await CHATS.updateOne(
