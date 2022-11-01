@@ -28,6 +28,7 @@ const router = createBrowserRouter([
     {
         path: '/sign-up',
         element: <SignUpPage />,
+        errorElement: <ErrorPage />,
     },
     {
         path: '/chats',
@@ -36,6 +37,7 @@ const router = createBrowserRouter([
                 <ChatsPage />
             </ProtectedRoute>
         ),
+        errorElement: <ErrorPage />,
     },
 ]);
 

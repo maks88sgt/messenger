@@ -6,6 +6,10 @@ export type UserDTO = {
 export class HttpClient {
     static baseUrl = process.env.BASE_URL || 'http://localhost:3001';
 
+    constructor() {
+        throw new Error ("It's not allowed, use static methods of client");
+    }
+
     static async signIn(data: { username: string; password: string }) {
         const parameters = {
             method: 'POST',

@@ -49,10 +49,10 @@ export const NewChat = ({ modalIsOpen, setModalIsOpen }: NewChatProps) => {
     return (
         <Modal isOpen={modalIsOpen} onClose={() => null}>
             <ModalOverlay />
-            <ModalContent sx={{ width: '40vw', maxHeight: '60vh' }}>
+            <ModalContent sx={{ width: '40vw', height: '60vh' }}>
                 <ModalHeader>Add new chat</ModalHeader>
                 <ModalCloseButton onClick={() => setModalIsOpen(false)} />
-                <ModalBody sx={{ maxHeight: '40vh' }}>
+                <ModalBody>
                     <FormInput
                         value={newChatName}
                         helperText={'Enter new chat name'}
@@ -71,7 +71,7 @@ export const NewChat = ({ modalIsOpen, setModalIsOpen }: NewChatProps) => {
                         selectedUsers={selectedUsers}
                     />
                 </ModalBody>
-                <ModalFooter>
+                <ModalFooter sx={{ backgroundColor: 'white', position: "relative", bottom: 0, right: 0, width: "100%" }}>
                     <Button
                         colorScheme="teal"
                         variant={'outline'}

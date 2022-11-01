@@ -56,6 +56,7 @@ export const SignInPage = () => {
                 />
                 <FormInput
                     label={'Password'}
+                    type={"password"}
                     helperText={'Enter your password'}
                     errorMessage={'Password is incorrect'}
                     value={password}

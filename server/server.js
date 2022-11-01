@@ -29,18 +29,21 @@ let USERS;
 //Chats collection
 let CHATS;
 
+//
+const DB_NAME = process.env.DB_NAME;
+
 //Server initialization, DB connection
 const server = app.listen(PORT, async () => {
   try {
     await client.connect();
-    USERS = client.db('newMongoDb').collection('users');
+    USERS = client.db(DB_NAME).collection('users');
     console.log(
       'Database connected, and contains ',
       await USERS.count(),
       ' user records',
     );
     console.log(`Example app listening on port ${PORT}!`);
-    CHATS = client.db('newMongoDb').collection('chats');
+    CHATS = client.db(DB_NAME).collection('chats');
   } catch (e) {
     console.error(e);
   }
@@ -209,12 +212,14 @@ socket.on('connect', (socket) => {
 
   //Add new connected user to the room
   socket.on('add_to_room', async (data) => {
+    console.log("!!!!!!", "connected")
     socket.join(data.chatName);
   });
 
-
+  console.log("!!!!!!", "connected")
   //Handle new message
   socket.on('new_message', async (data) => {
+    console.log(">>>>>>>>>>>>>", data)
     try {
       const timestamp = Date.now();
       await CHATS.updateOne(

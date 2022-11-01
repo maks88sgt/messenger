@@ -20,6 +20,7 @@ export const ActiveChat = () => {
                 p: '20px',
                 alignItems: 'center',
                 backgroundColor: 'teal.50',
+              position: "relative"
             }}
         >
             {selectedChat ? (
@@ -87,6 +88,9 @@ export const ActiveChat = () => {
                             display: 'grid',
                             gridTemplateColumns: '4fr 1fr',
                             gap: '10px',
+                          position: "absolute",
+                          bottom: 0,
+                          right: 0, p: "20px"
                         }}
                     >
                         <Input
